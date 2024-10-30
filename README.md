@@ -4,8 +4,6 @@ ICS files acquired from the STiNE scheduler export tool seem to be corrupted and
 
 This tool fixes the format of these files so they can be successfully imported.
 
-Additionally, it detects recurring events and converts them to actual iCal recurrences.
-
 ## Run locally
 
 ### Prerequisites
