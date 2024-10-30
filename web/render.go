@@ -33,7 +33,7 @@ func newRenderer() (*renderer, error) {
 	return r, nil
 }
 
-func (r *renderer) render(w http.ResponseWriter, status int, page string, data templateData) {
+func (r *renderer) render(w http.ResponseWriter, req *http.Request, status int, page string, data templateData) {
 	t, ok := r.templates[page]
 	if !ok {
 		serverError(w, fmt.Errorf("template %s does not exist", page))
@@ -41,7 +41,14 @@ func (r *renderer) render(w http.ResponseWriter, status int, page string, data t
 	}
 
 	buf := &bytes.Buffer{}
-	err := t.ExecuteTemplate(buf, "base", data)
+	type tmplData struct {
+		Nonce string
+		templateData
+	}
+	err := t.ExecuteTemplate(buf, "base", tmplData{
+		Nonce:        req.Context().Value("nonce").(string),
+		templateData: data,
+	})
 	if err != nil {
 		serverError(w, err)
 		return
