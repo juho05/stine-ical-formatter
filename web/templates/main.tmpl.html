@@ -1,3 +1,47 @@
 {{define "main"}}
-Hello, world!
+<div class="relative w-screen h-screen sm:flex sm:justify-center sm:items-center">
+  <a href="https://github.com/juho05/stine-ical-formatter" class="absolute right-2 top-2 link">Source Code</a>
+  <a href="https://github.com/juho05/stine-ical-formatter/issues" class="absolute left-2 top-2 link">Report Bug</a>
+  <p class="absolute left-2 bottom-2 text-sm">&copy; 2024 Julian Hofmann</p>
+  <div class="sm:card sm:bg-base-200 sm:h-auto sm:w-[680px] sm:min-w-[512px] h-screen">
+    <div class="sm:card-body p-4 sm:pt-6 pt-12 h-full overflow-auto">
+      <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
+      <details tabindex="0" class="collapse collapse-arrow bg-base-100 border border-accent mb-2">
+        <summary class="collapse-title text-l font-medium">What does it do?</summary>
+        <div class="collapse-content">
+          <p>
+            ICS files exported from the scheduler export tool in STiNE do not conform to the official iCalendar spec (<i>RFC 5545</i>). <br>
+            Many calendar application therefore have problems opening them.
+          </p>
+          <p class="mt-2">
+            <span class="font-bold">This tool changes the following:</span>
+          </p>
+          <ol class="list-decimal pl-6">
+            <li>Remove <i>NULL</i> bytes</li>
+            <li>Convert encoding from ISO8859-1 to UTF8</li>
+            <li>Remove empty lines</li>
+            <li>Ensure line endings are <i>CRLF</i></li>
+            <li>Combine files into one</li>
+          </ol>
+        </div>
+      </details>
+      <form action="/" method="post" class="flex flex-col gap-3 grow" enctype="multipart/form-data">
+        <label class="form-control w-full">
+          <div class="label">
+            <div class="label-text font-medium">
+              Select iCalendar (.ics) files:
+            </div>
+          </div>
+          <input type="file" class="file-input file-input-bordered w-full" multiple required>
+        </label>
+        {{if ne .ErrorMessage ""}}
+          <p class="text-error">ERROR: {{.ErrorMessage}}</p>
+        {{end}}
+        <div class="flex justify-center sm:mt-24 mt-16">
+          <button class="btn btn-primary">Format Files</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {{end}}

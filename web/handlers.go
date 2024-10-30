@@ -7,5 +7,7 @@ func (s *Server) handleGetMainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
-	s.renderer.render(w, r, http.StatusOK, "main", templateData{})
+	s.renderer.render(w, r, http.StatusOK, "main", templateData{
+		ErrorMessage: "not implemented",
+	})
 }
