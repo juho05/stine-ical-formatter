@@ -32,7 +32,7 @@
               Select iCalendar (.ics) files:
             </div>
           </div>
-          <input type="file" class="file-input file-input-bordered w-full" multiple required>
+          <input type="file" name="files" class="file-input file-input-bordered w-full" multiple required>
         </label>
         {{if ne .ErrorMessage ""}}
           <p class="text-error">ERROR: {{.ErrorMessage}}</p>
