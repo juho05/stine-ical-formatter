@@ -1,0 +1,4 @@
+.env
+docker-compose.yml
+/web/static/css/tailwind.css
+/bin

@@ -18,3 +18,17 @@ go run .
 ```
 
 Open http://localhost:8080.
+
+## Deploy with Docker
+
+Create `docker-compose.yml`:
+```yaml
+services:
+  stine-ical-formatter:
+    image: ghcr.io/juho05/stine-ical-formatter
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+```
+
+Run `docker compose up -d` in the same directory.
