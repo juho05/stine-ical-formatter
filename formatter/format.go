@@ -3,8 +3,10 @@ package formatter
 import (
 	"fmt"
 	"io"
+	"time"
 
 	ics "github.com/arran4/golang-ical"
+	"github.com/juho05/log"
 )
 
 func Format(files []io.Reader) ([]byte, error) {
@@ -12,6 +14,7 @@ func Format(files []io.Reader) ([]byte, error) {
 		Components:         []ics.Component{},
 		CalendarProperties: []ics.CalendarProperty{},
 	}
+	start := time.Now()
 	for i, f := range files {
 		cal, err := ics.ParseCalendar(newReader(f))
 		if err != nil {
@@ -28,5 +31,7 @@ func Format(files []io.Reader) ([]byte, error) {
 		}
 		calendar.Components = append(calendar.Components, components...)
 	}
-	return []byte(calendar.Serialize()), nil
+	data := []byte(calendar.Serialize())
+	log.Tracef("formatted %d files in %s resulting in %d bytes", len(files), time.Since(start).String(), len(data))
+	return data, nil
 }

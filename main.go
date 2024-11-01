@@ -54,6 +54,7 @@ func run() error {
 }
 
 func main() {
+	log.SetSeverity(log.TRACE)
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
