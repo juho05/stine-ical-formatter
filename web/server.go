@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
+	"github.com/didip/tollbooth/v7/limiter"
 	"github.com/go-chi/chi/v5"
 	"github.com/juho05/log"
 )
@@ -13,6 +16,7 @@ import (
 type Server struct {
 	httpServer http.Server
 	renderer   *renderer
+	limiter    *limiter.Limiter
 }
 
 func NewServer(addr string) (*Server, error) {
@@ -20,6 +24,13 @@ func NewServer(addr string) (*Server, error) {
 	renderer, err := newRenderer()
 	if err != nil {
 		return nil, fmt.Errorf("new renderer: %w", err)
+	}
+
+	limit := limiter.New(nil).SetBurst(2).SetMax(2)
+	if v, _ := strconv.ParseBool(os.Getenv("RATE_LIMIT_X_FORWARDED_FOR")); v {
+		limit.SetIPLookups([]string{"X-Forwarded-For", "RemoteAddr"}).SetForwardedForIndexFromBehind(0)
+	} else {
+		limit.SetIPLookups([]string{"RemoteAddr"})
 	}
 
 	server := &Server{
@@ -32,6 +43,7 @@ func NewServer(addr string) (*Server, error) {
 			Handler:           router,
 		},
 		renderer: renderer,
+		limiter:  limit,
 	}
 
 	registerMiddlewares(router)

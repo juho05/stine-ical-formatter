@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/didip/tollbooth/v7"
 	"github.com/juho05/log"
 	"github.com/juho05/stine-ical-formatter/formatter"
 )
@@ -20,8 +21,13 @@ func (s *Server) handleGetMainPage(w http.ResponseWriter, r *http.Request) {
 const maxFileSize = 15e6
 
 func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
+	if err := tollbooth.LimitByRequest(s.limiter, w, r); err != nil {
+		s.renderer.render(w, r, http.StatusOK, "main", templateData{
+			ErrorMessage: "rate limit exceeded",
+		})
+		return
+	}
 	r.Body = http.MaxBytesReader(w, r.Body, maxFileSize)
-	defer r.Body.Close()
 	err := r.ParseMultipartForm(maxFileSize)
 	if err != nil {
 		var maxBytesError *http.MaxBytesError
