@@ -14,7 +14,6 @@ import (
 )
 
 func (s *Server) handleGetMainPage(w http.ResponseWriter, r *http.Request) {
-	log.Trace("main page accessed")
 	s.renderer.render(w, r, http.StatusOK, "main", templateData{})
 }
 

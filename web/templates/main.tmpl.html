@@ -2,10 +2,28 @@
 <div class="relative w-screen h-screen sm:flex sm:justify-center sm:items-center">
   <a href="https://github.com/juho05/stine-ical-formatter" class="absolute right-2 top-2 link">Source Code</a>
   <a href="https://github.com/juho05/stine-ical-formatter/issues" class="absolute left-2 top-2 link">Report Bug</a>
-  <p class="absolute left-2 bottom-2 text-sm">&copy; 2024 Julian Hofmann</p>
+  <p class="absolute left-2 bottom-2 text-sm">&copy; 2024-2025 Julian Hofmann</p>
   <div class="sm:card sm:bg-base-200 sm:h-auto sm:w-[680px] sm:min-w-[512px] h-screen">
     <div class="sm:card-body p-4 sm:pt-6 pt-12 h-full overflow-auto">
       <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
+      <details tabindex="0" class="collapse collapse-arrow bg-base-100 border border-secondary mb-2">
+        <summary class="collapse-title text-l font-medium">How to use? <b>(Read before using)</b></summary>
+        <div class="collapse-content">
+          <ol class="list-decimal pl-6">
+            <li>Open <i>Scheduler/Termine</i>-><i>Scheduler export/Terminexport</i></li>
+            <li>Select the first month of the coming semester</li>
+            <li>Select <i>Export Appointments/Termine exportieren</i></li>
+            <li>Click on <i>/Kalenderdatei</i> to download all events for the selected month in a <i>.ics</i> file</li>
+            <li>Repeat for all months in the coming semester</li>
+            <li>Click on the file input below on this page and select <b>all</b> downloaded <i>.ics</i> files</li>
+            <li>Click <i>Format Files</i></li>
+            <li>Import the downloaded <i>calendar.ics</i> file in your calendar application of choice</li>
+          </ol>
+          <p class="mt-2">
+            <b>DO NOT USE FOR FILES NOT EXPORTED FROM STiNE!</b>
+          </p>
+        </div>
+      </details>
       <details tabindex="0" class="collapse collapse-arrow bg-base-100 border border-accent mb-2">
         <summary class="collapse-title text-l font-medium">What does it do?</summary>
         <div class="collapse-content">
@@ -22,6 +40,7 @@
             <li>Remove empty lines</li>
             <li>Ensure line endings are <i>CRLF</i></li>
             <li>Combine files into one</li>
+            <li>Detect and merge recurrences</li>
           </ol>
           <p class="mt-2">
             <i>This tool assumes that all files are ISO8859-1 encoded (because STiNE does so).
