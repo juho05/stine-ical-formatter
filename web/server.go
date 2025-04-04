@@ -17,6 +17,7 @@ type Server struct {
 	httpServer http.Server
 	renderer   *renderer
 	limiter    *limiter.Limiter
+	metrics    *Metrics
 }
 
 func NewServer(addr string) (*Server, error) {
@@ -44,6 +45,7 @@ func NewServer(addr string) (*Server, error) {
 		},
 		renderer: renderer,
 		limiter:  limit,
+		metrics:  &Metrics{},
 	}
 
 	registerMiddlewares(router)

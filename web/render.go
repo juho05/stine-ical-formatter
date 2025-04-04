@@ -14,6 +14,7 @@ import (
 
 type renderer struct {
 	templates map[string]*template.Template
+	metrics   *Metrics
 }
 
 type templateData struct {
@@ -38,6 +39,7 @@ func (r *renderer) render(w http.ResponseWriter, req *http.Request, status int, 
 	t, ok := r.templates[page]
 	if !ok {
 		serverError(w, fmt.Errorf("template %s does not exist", page))
+		r.metrics.FailureOther()
 		return
 	}
 
@@ -58,6 +60,7 @@ func (r *renderer) render(w http.ResponseWriter, req *http.Request, status int, 
 	})
 	if err != nil {
 		serverError(w, err)
+		r.metrics.FailureOther()
 		return
 	}
 

@@ -15,12 +15,14 @@ import (
 )
 
 func (s *Server) handleGetMainPage(w http.ResponseWriter, r *http.Request) {
+	s.metrics.Visit()
 	s.renderer.render(w, r, http.StatusOK, "main", templateData{})
 }
 
 func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	if err := tollbooth.LimitByRequest(s.limiter, w, r); err != nil {
 		log.Warn("rate limit reached")
+		s.metrics.FailureRateLimit()
 		s.renderer.render(w, r, http.StatusTooManyRequests, "main", templateData{
 			ErrorMessageKey: "error.rate-limit",
 		})
@@ -32,9 +34,11 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 		errKey := "error.unexpected"
 		if errors.As(err, &maxBytesError) {
 			errKey = "files too large (sum must be <5MB)"
+			s.metrics.FailureTooLarge()
 			log.Warnf("uploaded file is too large: content length: %d", r.ContentLength)
 		} else {
-			log.Errorf("failed parse multipart form: %w", err)
+			s.metrics.FailureParseForm()
+			log.Errorf("failed parse multipart form: %s", err)
 		}
 		s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
 			ErrorMessageKey: errKey,
@@ -44,6 +48,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 
 	if len(r.MultipartForm.File["files"]) == 0 {
 		log.Warn("no file uploaded")
+		s.metrics.FailureNoFiles()
 		s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
 			ErrorMessageKey: "error.no-files",
 		})
@@ -53,6 +58,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	for _, v := range r.MultipartForm.File["files"] {
 		if !slices.Contains([]string{".ical", ".ics", ".ifb", ".icalendar"}, strings.ToLower(filepath.Ext(v.Filename))) {
 			log.Warnf("wrong extension: %s", v.Filename)
+			s.metrics.FailureWrongFile()
 			s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
 				ErrorMessageKey: "error.not-ics",
 			})
@@ -60,7 +66,8 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 		}
 		f, err := v.Open()
 		if err != nil {
-			log.Errorf("failed to open uploaded file: %w", err)
+			s.metrics.FailureOther()
+			log.Errorf("failed to open uploaded file: %s", err)
 			s.renderer.render(w, r, http.StatusInternalServerError, "main", templateData{
 				ErrorMessageKey: "error.failed-to-open",
 			})
@@ -72,7 +79,8 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 
 	output, err := formatter.Format(files)
 	if err != nil {
-		log.Errorf("failed to format files: %w", err)
+		s.metrics.FailureFormat()
+		log.Errorf("failed to format files: %s", err)
 		s.renderer.render(w, r, http.StatusInternalServerError, "main", templateData{
 			ErrorMessageKey: "error.format-failed",
 		})
@@ -82,4 +90,5 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/calendar")
 	w.Header().Set("Content-Disposition", `attachment; filename="calendar.ics"`)
 	_, _ = w.Write(output)
+	s.metrics.Success()
 }
