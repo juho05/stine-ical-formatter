@@ -17,7 +17,7 @@ func serverError(w http.ResponseWriter, err error) {
 func generateToken(length int) string {
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	ret := make([]byte, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
 		if err != nil {
 			panic(err)

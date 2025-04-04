@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -16,7 +17,7 @@ type renderer struct {
 }
 
 type templateData struct {
-	ErrorMessage string
+	ErrorMessageKey string
 }
 
 //go:embed templates/*.tmpl.html
@@ -40,14 +41,20 @@ func (r *renderer) render(w http.ResponseWriter, req *http.Request, status int, 
 		return
 	}
 
+	lang := langFromAcceptLanguageHeader(req.Header.Get("Accept-Language"))
+
 	buf := &bytes.Buffer{}
 	type tmplData struct {
 		Nonce string
 		templateData
+		Translate func(key string) template.HTML
 	}
 	err := t.ExecuteTemplate(buf, "base", tmplData{
 		Nonce:        req.Context().Value("nonce").(string),
 		templateData: data,
+		Translate: func(key string) template.HTML {
+			return template.HTML(Translate(lang, key))
+		},
 	})
 	if err != nil {
 		serverError(w, err)
@@ -81,4 +88,35 @@ func (r *renderer) loadTemplates(htmlFS fs.FS) error {
 	}
 
 	return nil
+}
+
+func langFromAcceptLanguageHeader(headerValue string) string {
+	lang := "en"
+	quality := float64(0)
+
+	strs := strings.Split(headerValue, ",")
+	for _, s := range strs {
+		parts := strings.Split(s, ";")
+		q := float64(1)
+		if len(parts) > 1 {
+			qStr := parts[1]
+			qStr = strings.ReplaceAll(qStr, "q", "")
+			qStr = strings.ReplaceAll(qStr, "=", "")
+			qStr = strings.TrimSpace(qStr)
+			_, err := strconv.ParseFloat(qStr, 64)
+			if err == nil {
+				q, _ = strconv.ParseFloat(qStr, 64)
+			}
+		}
+
+		if q > quality {
+			l := strings.TrimSpace(strings.Split(parts[0], "-")[0])
+			if _, ok := translations[l]; ok {
+				lang = l
+				quality = q
+			}
+		}
+	}
+
+	return lang
 }

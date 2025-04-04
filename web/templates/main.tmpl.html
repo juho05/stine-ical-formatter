@@ -1,71 +1,112 @@
 {{define "main"}}
-<div class="relative w-screen h-screen sm:flex sm:justify-center sm:items-center">
-  <a href="https://github.com/juho05/stine-ical-formatter" class="absolute right-2 top-2 link">Source Code</a>
-  <a href="https://github.com/juho05/stine-ical-formatter/issues" class="absolute left-2 top-2 link">Report Bug</a>
-  <p class="absolute left-2 bottom-2 text-sm">&copy; 2024-2025 Julian Hofmann</p>
-  <a href="https://github.com/juho05/stine-ical-formatter/blob/main/LICENSE" class="absolute right-2 bottom-2 link">License</a>
-  <div class="sm:card sm:bg-base-200 sm:h-auto sm:w-[680px] sm:min-w-[512px] h-screen">
+<div
+  class="relative w-screen h-screen sm:flex sm:justify-center sm:items-center"
+>
+  <a
+    href="https://github.com/juho05/stine-ical-formatter"
+    class="absolute right-2 top-2 link"
+    >Source Code</a
+  >
+  <a
+    href="https://github.com/juho05/stine-ical-formatter/issues"
+    class="absolute left-2 top-2 link"
+    >Report Bug</a
+  >
+  <p class="absolute left-2 bottom-2 text-sm">
+    &copy; 2024-2025 Julian Hofmann
+  </p>
+  <a
+    href="https://github.com/juho05/stine-ical-formatter/blob/main/LICENSE"
+    class="absolute right-2 bottom-2 link"
+    >License</a
+  >
+  <div
+    class="sm:card sm:bg-base-200 sm:h-auto sm:w-[680px] sm:min-w-[512px] h-screen"
+  >
     <div class="sm:card-body p-4 sm:pt-6 pt-12 h-full overflow-auto">
       <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
-      <details tabindex="0" class="collapse collapse-arrow bg-base-100 border border-secondary mb-2">
-        <summary class="collapse-title text-l font-medium">How to use? <b>(Read before using)</b></summary>
+      <details
+        tabindex="0"
+        class="collapse collapse-arrow bg-base-100 border border-secondary mb-2"
+      >
+        <summary class="collapse-title text-l font-medium">
+          {{call .Translate "how-to"}}
+        </summary>
         <div class="collapse-content">
           <ol class="list-decimal pl-6">
-            <li>Open <i>Scheduler/Termine</i>-><i>Scheduler export/Terminexport</i> in <i>STiNE</i></li>
-            <li>Select the first month of the coming semester</li>
-            <li>Select <i>Export Appointments/Termine exportieren</i></li>
-            <li>Click on <i>Calendar file/Kalenderdatei</i> to download all events for the selected month as an <i>.ics</i> file</li>
-            <li>Repeat for all months in the coming semester</li>
-            <li>Click on the file input below on this page and select <b>all</b> downloaded <i>.ics</i> files</li>
-            <li>Click <i>Format Files</i></li>
-            <li>Import the downloaded <i>calendar.ics</i> file in your calendar application of choice</li>
+            <li>{{call .Translate "how-to.1"}}</li>
+            <li>{{call .Translate "how-to.2"}}</li>
+            <li>{{call .Translate "how-to.3"}}</li>
+            <li>{{call .Translate "how-to.4"}}</li>
+            <li>{{call .Translate "how-to.5"}}</li>
+            <li>{{call .Translate "how-to.6"}}</li>
+            <li>{{call .Translate "how-to.7"}}</li>
+            <li>{{call .Translate "how-to.8"}}</li>
+            <li>{{call .Translate "how-to.9"}}</li>
           </ol>
           <p class="mt-2">
-            <b>DO NOT USE FOR FILES NOT EXPORTED FROM STiNE!</b>
+            <b>{{call .Translate "how-to.warning"}}</b>
           </p>
         </div>
       </details>
-      <details tabindex="0" class="collapse collapse-arrow bg-base-100 border border-accent mb-2">
-        <summary class="collapse-title text-l font-medium">What does it do?</summary>
+      <details
+        tabindex="0"
+        class="collapse collapse-arrow bg-base-100 border border-accent mb-2"
+      >
+        <summary class="collapse-title text-l font-medium">
+          {{call .Translate "what-does-it-do"}}
+        </summary>
         <div class="collapse-content">
-          <p>
-            ICS files exported from the scheduler export tool in STiNE do not conform to the official iCalendar spec (<i>RFC 5545</i>). <br>
-            Many calendar application therefore have problems opening them.
-          </p>
+          <p>{{call .Translate "what-does-it-do.preamble"}}</p>
           <p class="mt-2">
-            <span class="font-bold">This tool changes the following:</span>
+            <span class="font-bold"
+              >{{call .Translate "what-does-it-do.list-title"}}</span
+            >
           </p>
           <ol class="list-decimal pl-6">
-            <li>Remove <i>NULL</i> bytes</li>
-            <li>Convert encoding from ISO8859-1 to UTF8</li>
-            <li>Remove empty lines</li>
-            <li>Ensure line endings are <i>CRLF</i></li>
-            <li>Combine files into one</li>
-            <li>Detect and merge recurrences</li>
+            <li>{{call .Translate "what-does-it-do.1"}}</li>
+            <li>{{call .Translate "what-does-it-do.2"}}</li>
+            <li>{{call .Translate "what-does-it-do.3"}}</li>
+            <li>{{call .Translate "what-does-it-do.4"}}</li>
+            <li>{{call .Translate "what-does-it-do.5"}}</li>
+            <li>{{call .Translate "what-does-it-do.6"}}</li>
           </ol>
           <p class="mt-2">
-            <i>This tool assumes that all files are ISO8859-1 encoded (because STiNE does so).
-            If they are already UTF-8 encoded, some special characters might turn out incorrect.</i>
+            <i>{{call .Translate "what-does-it-do.more-info"}}</i>
           </p>
         </div>
       </details>
-      <form action="/" method="post" class="flex flex-col gap-3 grow" enctype="multipart/form-data">
+      <form
+        action="/"
+        method="post"
+        class="flex flex-col gap-3 grow"
+        enctype="multipart/form-data"
+      >
         <label class="form-control w-full">
           <div class="label">
             <div class="label-text font-medium">
-              Select iCalendar (.ics) files:
+              {{call .Translate "select-files"}}
             </div>
           </div>
-          <input type="file" name="files" class="file-input file-input-bordered w-full" multiple required>
+          <input
+            type="file"
+            name="files"
+            class="file-input file-input-bordered w-full"
+            multiple
+            required
+          />
         </label>
-        {{if ne .ErrorMessage ""}}
-          <p class="text-error">ERROR: {{.ErrorMessage}}</p>
+        {{if ne .ErrorMessageKey ""}}
+        <p class="text-error">ERROR: {{call .Translate .ErrorMessageKey}}</p>
         {{end}}
         <div class="flex justify-center sm:mt-24 mt-16">
-          <button class="btn btn-primary">Format Files</button>
+          <button class="btn btn-primary">
+            {{call .Translate "format-files"}}
+          </button>
         </div>
       </form>
     </div>
   </div>
 </div>
 {{end}}
+

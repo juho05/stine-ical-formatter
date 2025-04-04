@@ -10,6 +10,7 @@ import (
 
 	"github.com/didip/tollbooth/v7"
 	"github.com/juho05/log"
+
 	"github.com/juho05/stine-ical-formatter/formatter"
 )
 
@@ -17,30 +18,26 @@ func (s *Server) handleGetMainPage(w http.ResponseWriter, r *http.Request) {
 	s.renderer.render(w, r, http.StatusOK, "main", templateData{})
 }
 
-// 15 MB
-const maxFileSize = 15e6
-
 func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	if err := tollbooth.LimitByRequest(s.limiter, w, r); err != nil {
 		log.Warn("rate limit reached")
 		s.renderer.render(w, r, http.StatusTooManyRequests, "main", templateData{
-			ErrorMessage: "rate limit exceeded",
+			ErrorMessageKey: "error.rate-limit",
 		})
 		return
 	}
-	r.Body = http.MaxBytesReader(w, r.Body, maxFileSize)
-	err := r.ParseMultipartForm(maxFileSize)
+	err := r.ParseMultipartForm(5e6) // 5 MB
 	if err != nil {
 		var maxBytesError *http.MaxBytesError
-		errMsg := "an unexpected error occured"
+		errKey := "error.unexpected"
 		if errors.As(err, &maxBytesError) {
-			errMsg = "files too large (sum must be <15MB)"
+			errKey = "files too large (sum must be <5MB)"
 			log.Warnf("uploaded file is too large: content length: %d", r.ContentLength)
 		} else {
 			log.Errorf("failed parse multipart form: %w", err)
 		}
 		s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
-			ErrorMessage: errMsg,
+			ErrorMessageKey: errKey,
 		})
 		return
 	}
@@ -48,7 +45,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	if len(r.MultipartForm.File["files"]) == 0 {
 		log.Warn("no file uploaded")
 		s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
-			ErrorMessage: "no files selected",
+			ErrorMessageKey: "error.no-files",
 		})
 		return
 	}
@@ -57,7 +54,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 		if !slices.Contains([]string{".ical", ".ics", ".ifb", ".icalendar"}, strings.ToLower(filepath.Ext(v.Filename))) {
 			log.Warnf("wrong extension: %s", v.Filename)
 			s.renderer.render(w, r, http.StatusBadRequest, "main", templateData{
-				ErrorMessage: "at least one file is not an iCalendar file (extension: .ics)",
+				ErrorMessageKey: "error.not-ics",
 			})
 			return
 		}
@@ -65,7 +62,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Errorf("failed to open uploaded file: %w", err)
 			s.renderer.render(w, r, http.StatusInternalServerError, "main", templateData{
-				ErrorMessage: "file(s) could not be opened",
+				ErrorMessageKey: "error.failed-to-open",
 			})
 			return
 		}
@@ -77,7 +74,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("failed to format files: %w", err)
 		s.renderer.render(w, r, http.StatusInternalServerError, "main", templateData{
-			ErrorMessage: err.Error(),
+			ErrorMessageKey: "error.format-failed",
 		})
 		return
 	}

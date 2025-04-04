@@ -41,7 +41,7 @@ func registerMiddlewares(r chi.Router) {
 	r.Use(generateNonce)
 	r.Use(securityHeaders)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.RequestSize(15e7)) // 15 MB
+	r.Use(middleware.RequestSize(6e6)) // 6 MB
 	r.Use(middleware.CleanPath)
 }
 
