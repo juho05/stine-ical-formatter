@@ -45,7 +45,7 @@ func NewServer(addr string) (*Server, error) {
 		},
 		renderer: renderer,
 		limiter:  limit,
-		metrics:  &Metrics{},
+		metrics:  NewMetrics(),
 	}
 
 	registerMiddlewares(router)

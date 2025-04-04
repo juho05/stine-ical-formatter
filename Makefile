@@ -33,4 +33,4 @@ run: tailwind-build
 .PHONY: clean
 clean:
 	go clean
-	rm -r ${OUT_DIR}
+	rm -rf ${OUT_DIR}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/juho05/log"
 )
@@ -11,6 +12,7 @@ import (
 type Metrics struct {
 	lock sync.RWMutex
 
+	startTime    time.Time
 	successCount int
 	visitCount   int
 
@@ -21,6 +23,12 @@ type Metrics struct {
 	failureRateLimitCount int
 	failureNoFilesCount   int
 	failureOtherCount     int
+}
+
+func NewMetrics() *Metrics {
+	return &Metrics{
+		startTime: time.Now().UTC(),
+	}
 }
 
 func (m *Metrics) Success() {
@@ -85,8 +93,9 @@ func (m *Metrics) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	encoder.SetIndent("", "  ")
 	err := encoder.Encode(map[string]map[string]any{
 		"metrics": {
-			"success": m.successCount,
-			"visits":  m.visitCount,
+			"success":   m.successCount,
+			"visits":    m.visitCount,
+			"startTime": m.startTime,
 			"failure": map[string]int{
 				"total":            m.failureTooLargeCount + m.failureWrongFileCount + m.failureParseFormCount + m.failureFormatCount + m.failureOtherCount,
 				"filesTooLarge":    m.failureTooLargeCount,
