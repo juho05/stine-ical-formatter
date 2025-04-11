@@ -63,8 +63,13 @@ func combineEvents(cal *ics.Calendar) error {
 		}
 		startH, startM, startS := startAt.Clock()
 		endH, endM, endS := endAt.Clock()
+		var location string
+		if l := e.GetProperty(ics.ComponentPropertyLocation); l != nil {
+			location = l.Value
+		}
 		key := strings.Join([]string{
 			e.GetProperty(ics.ComponentPropertySummary).Value,
+			location,
 			startAt.Weekday().String(),
 			fmt.Sprintf("%d:%d:%d", startH, startM, startS),
 			endAt.Weekday().String(),
