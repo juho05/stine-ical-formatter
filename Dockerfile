@@ -14,9 +14,12 @@ RUN apk add --no-cache make nodejs npm
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
+COPY package.json package-lock.json ./
+RUN npm ci
+
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} make clean && make
+RUN make clean && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} make
 
 # Run
 FROM alpine AS stine-ical-formatter
