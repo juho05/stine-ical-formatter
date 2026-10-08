@@ -22,7 +22,8 @@ type Server struct {
 
 func NewServer(addr string) (*Server, error) {
 	router := chi.NewMux()
-	renderer, err := newRenderer()
+	metrics := NewMetrics()
+	renderer, err := newRenderer(metrics)
 	if err != nil {
 		return nil, fmt.Errorf("new renderer: %w", err)
 	}
@@ -45,7 +46,7 @@ func NewServer(addr string) (*Server, error) {
 		},
 		renderer: renderer,
 		limiter:  limit,
-		metrics:  NewMetrics(),
+		metrics:  metrics,
 	}
 
 	registerMiddlewares(router)

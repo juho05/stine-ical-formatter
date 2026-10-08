@@ -24,9 +24,10 @@ type templateData struct {
 //go:embed templates/*.tmpl.html
 var templateFS embed.FS
 
-func newRenderer() (*renderer, error) {
+func newRenderer(metrics *Metrics) (*renderer, error) {
 	r := &renderer{
 		templates: make(map[string]*template.Template),
+		metrics:   metrics,
 	}
 	err := r.loadTemplates(templateFS)
 	if err != nil {

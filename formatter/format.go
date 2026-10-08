@@ -48,9 +48,17 @@ func combineEvents(cal *ics.Calendar) error {
 
 	distinct := make(map[string][]*ics.VEvent, 10)
 	for _, e := range events {
-		startAtProp := strings.Split(e.GetProperty(ics.ComponentPropertyDtStart).Value, ":")
+		dtStart := e.GetProperty(ics.ComponentPropertyDtStart)
+		if dtStart == nil {
+			return fmt.Errorf("event %s has no DTSTART", e.Id())
+		}
+		dtEnd := e.GetProperty(ics.ComponentPropertyDtEnd)
+		if dtEnd == nil {
+			return fmt.Errorf("event %s has no DTEND", e.Id())
+		}
+		startAtProp := strings.Split(dtStart.Value, ":")
 		e.SetProperty(ics.ComponentPropertyDtStart, startAtProp[len(startAtProp)-1])
-		endAtProp := strings.Split(e.GetProperty(ics.ComponentPropertyDtEnd).Value, ":")
+		endAtProp := strings.Split(dtEnd.Value, ":")
 		e.SetProperty(ics.ComponentPropertyDtEnd, endAtProp[len(endAtProp)-1])
 
 		startAt, err := e.GetStartAt()
@@ -63,12 +71,16 @@ func combineEvents(cal *ics.Calendar) error {
 		}
 		startH, startM, startS := startAt.Clock()
 		endH, endM, endS := endAt.Clock()
+		var summary string
+		if s := e.GetProperty(ics.ComponentPropertySummary); s != nil {
+			summary = s.Value
+		}
 		var location string
 		if l := e.GetProperty(ics.ComponentPropertyLocation); l != nil {
 			location = l.Value
 		}
 		key := strings.Join([]string{
-			e.GetProperty(ics.ComponentPropertySummary).Value,
+			summary,
 			location,
 			startAt.Weekday().String(),
 			fmt.Sprintf("%d:%d:%d", startH, startM, startS),
