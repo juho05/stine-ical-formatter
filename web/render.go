@@ -49,11 +49,13 @@ func (r *renderer) render(w http.ResponseWriter, req *http.Request, status int, 
 	buf := &bytes.Buffer{}
 	type tmplData struct {
 		Nonce string
+		Lang  string
 		templateData
 		Translate func(key string) template.HTML
 	}
 	err := t.ExecuteTemplate(buf, "base", tmplData{
 		Nonce:        req.Context().Value("nonce").(string),
+		Lang:         lang,
 		templateData: data,
 		Translate: func(key string) template.HTML {
 			return template.HTML(Translate(lang, key))

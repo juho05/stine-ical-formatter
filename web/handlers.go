@@ -33,7 +33,7 @@ func (s *Server) handlePostMainPage(w http.ResponseWriter, r *http.Request) {
 		var maxBytesError *http.MaxBytesError
 		errKey := "error.unexpected"
 		if errors.As(err, &maxBytesError) {
-			errKey = "files too large (sum must be <5MB)"
+			errKey = "error.files-too-large"
 			s.metrics.FailureTooLarge()
 			log.Warnf("uploaded file is too large: content length: %d", r.ContentLength)
 		} else {
