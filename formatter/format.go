@@ -50,7 +50,7 @@ func Format(files []io.Reader) ([]byte, error) {
 		return nil, fmt.Errorf("combine events: %w", err)
 	}
 
-	data := []byte(calendar.Serialize())
+	data := []byte(calendar.Serialize(ics.WithNewLineWindows))
 	log.Tracef("formatted %d files in %s resulting in %d bytes", len(files), time.Since(start).String(), len(data))
 	return data, nil
 }

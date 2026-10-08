@@ -43,7 +43,7 @@ func Rename(calendar []byte, names []string) ([]byte, error) {
 			summary.Value = n
 		}
 	}
-	return []byte(cal.Serialize()), nil
+	return []byte(cal.Serialize(ics.WithNewLineWindows)), nil
 }
 
 func eventNames(cal *ics.Calendar) []string {

@@ -23,7 +23,7 @@
   <div
     class="sm:card sm:bg-base-200 sm:h-auto sm:max-h-full sm:w-[680px] sm:min-w-[512px] h-screen"
   >
-    <div class="sm:card-body p-4 sm:pt-6 pt-16 h-full overflow-auto">
+    <div class="sm:card-body p-4 sm:p-8 sm:pt-6 pt-16 h-full overflow-auto">
       <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
       {{if .Names}}
       <form action="/export" method="post" class="flex flex-col gap-3 grow">
@@ -38,7 +38,7 @@
           placeholder="{{.}}"
           aria-label="{{.}}"
           maxlength="200"
-          class="input input-bordered w-full"
+          class="input w-full"
         />
         {{end}}
         <div class="flex justify-center gap-3 mt-6 mb-10 sm:mb-0">
@@ -104,16 +104,14 @@
         class="flex flex-col gap-3 grow"
         enctype="multipart/form-data"
       >
-        <label class="form-control w-full">
-          <div class="label">
-            <div class="label-text font-medium">
-              {{call .Translate "select-files"}}
-            </div>
-          </div>
+        <label class="flex flex-col w-full">
+          <span class="px-1 py-2 text-sm font-medium">
+            {{call .Translate "select-files"}}
+          </span>
           <input
             type="file"
             name="files"
-            class="file-input file-input-bordered w-full"
+            class="file-input w-full"
             multiple
             required
           />

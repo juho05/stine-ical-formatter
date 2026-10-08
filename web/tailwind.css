@@ -1,0 +1,7 @@
+@import "tailwindcss" source(none);
+@source "./templates/**/*.tmpl.html";
+@plugin "daisyui";
+
+@theme {
+  --breakpoint-xs: 30rem;
+}

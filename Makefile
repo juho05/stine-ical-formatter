@@ -13,11 +13,11 @@ init:
 
 .PHONY: tailwind-watch
 tailwind-watch:
-	npx tailwindcss build -o web/static/css/tailwind.css --watch
+	npx @tailwindcss/cli -i web/tailwind.css -o web/static/css/tailwind.css --watch
 
 .PHONY: tailwind-build
 tailwind-build:
-	npx tailwindcss build -o web/static/css/tailwind.css --minify
+	npx @tailwindcss/cli -i web/tailwind.css -o web/static/css/tailwind.css --minify
 
 .PHONY: go-watch
 go-watch:
