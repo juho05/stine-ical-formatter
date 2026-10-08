@@ -3,17 +3,25 @@ package formatter
 import (
 	"fmt"
 	"io"
+	"math"
 	"slices"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	ics "github.com/arran4/golang-ical"
 	"github.com/juho05/log"
 )
 
+const (
+	timezone        = "Europe/Berlin"
+	localTimeFormat = "20060102T150405"
+	utcTimeFormat   = "20060102T150405Z"
+)
+
 func Format(files []io.Reader) ([]byte, error) {
 	calendar := &ics.Calendar{
-		Components:         []ics.Component{},
+		Components:         []ics.Component{newTimezone()},
 		CalendarProperties: []ics.CalendarProperty{},
 	}
 	start := time.Now()
@@ -22,12 +30,16 @@ func Format(files []io.Reader) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid file content: %w", err)
 		}
+		err = validate(cal)
+		if err != nil {
+			return nil, fmt.Errorf("unexpected file content: %w", err)
+		}
 		if i == 0 {
 			calendar.CalendarProperties = append(calendar.CalendarProperties, cal.CalendarProperties...)
 		}
 		components := make([]ics.Component, 0, len(cal.Components))
 		for _, c := range cal.Components {
-			if _, ok := c.(*ics.VTimezone); !ok || i == 0 {
+			if _, ok := c.(*ics.VTimezone); !ok {
 				components = append(components, c)
 			}
 		}
@@ -43,8 +55,28 @@ func Format(files []io.Reader) ([]byte, error) {
 	return data, nil
 }
 
+func newTimezone() *ics.VTimezone {
+	tz := ics.NewTimezone(timezone)
+	standard := &ics.Standard{}
+	standard.AddProperty(ics.ComponentPropertyDtStart, "19701025T030000")
+	standard.AddProperty(ics.ComponentPropertyRrule, "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10")
+	standard.AddProperty(ics.ComponentProperty(ics.PropertyTzoffsetfrom), "+0200")
+	standard.AddProperty(ics.ComponentProperty(ics.PropertyTzoffsetto), "+0100")
+	daylight := &ics.Daylight{}
+	daylight.AddProperty(ics.ComponentPropertyDtStart, "19700329T020000")
+	daylight.AddProperty(ics.ComponentPropertyRrule, "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3")
+	daylight.AddProperty(ics.ComponentProperty(ics.PropertyTzoffsetfrom), "+0100")
+	daylight.AddProperty(ics.ComponentProperty(ics.PropertyTzoffsetto), "+0200")
+	tz.Components = append(tz.Components, standard, daylight)
+	return tz
+}
+
 func combineEvents(cal *ics.Calendar) error {
 	events := cal.Events()
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		return fmt.Errorf("load timezone: %w", err)
+	}
 
 	distinct := make(map[string][]*ics.VEvent, 10)
 	for _, e := range events {
@@ -107,12 +139,13 @@ func combineEvents(cal *ics.Calendar) error {
 				continue
 			}
 			start := mustGetStartAt(e)
-			excluded := int(start.Sub(previous).Hours()/24)/7 - 1
+			// a clock change makes the gap an hour shorter or longer
+			excluded := int(math.Round(start.Sub(previous).Hours()/24))/7 - 1
 			for x := range excluded {
 				exclude := previous.AddDate(0, 0, 7*(x+1))
-				d[0].AddExdate(exclude.Format("20060102T150405"), &ics.KeyValues{
+				d[0].AddExdate(exclude.Format(localTimeFormat), &ics.KeyValues{
 					Key:   "TZID",
-					Value: []string{"CampusNetZeit"},
+					Value: []string{timezone},
 				})
 			}
 			previous = start
@@ -121,10 +154,14 @@ func combineEvents(cal *ics.Calendar) error {
 		}
 
 		if len(d) > 1 {
-			d[0].AddRrule(fmt.Sprintf("FREQ=WEEKLY;UNTIL=%s", d[len(d)-1].GetProperty(ics.ComponentPropertyDtStart).Value))
+			until, err := time.ParseInLocation(localTimeFormat, d[len(d)-1].GetProperty(ics.ComponentPropertyDtStart).Value, loc)
+			if err != nil {
+				return fmt.Errorf("parse last start: %w", err)
+			}
+			d[0].AddRrule(fmt.Sprintf("FREQ=WEEKLY;UNTIL=%s", until.UTC().Format(utcTimeFormat)))
 		}
-		d[0].GetProperty(ics.ComponentPropertyDtStart).ICalParameters["TZID"] = []string{"CampusNetZeit"}
-		d[0].GetProperty(ics.ComponentPropertyDtEnd).ICalParameters["TZID"] = []string{"CampusNetZeit"}
+		d[0].GetProperty(ics.ComponentPropertyDtStart).ICalParameters["TZID"] = []string{timezone}
+		d[0].GetProperty(ics.ComponentPropertyDtEnd).ICalParameters["TZID"] = []string{timezone}
 	}
 
 	return nil
