@@ -27,12 +27,11 @@ func securityHeaders(next http.Handler) http.Handler {
 		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'none'; script-src 'self' 'nonce-%s'; img-src 'self'; style-src 'self' 'nonce-%s'; font-src 'self';", nonce, nonce))
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("Permissions-Policy", "geolocation=(), camera=(), microphone=()")
+		w.Header().Set("Permissions-Policy", "geolocation=(), camera=(), microphone=(), interest-cohort=()")
 		w.Header().Set("Referrer-Policy", "no-referrer")
 		w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
 		w.Header().Set("Cross-Origin-Embedder-Policy", "require-corp")
 		w.Header().Set("Cross-Origin-Resource-Policy", "same-site")
-		w.Header().Set("Permissions-Policy", "interest-cohort=()")
 		next.ServeHTTP(w, r)
 	})
 }

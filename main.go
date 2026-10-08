@@ -37,7 +37,7 @@ func run() error {
 		timeout, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
 		err := server.Shutdown(timeout)
 		if err != nil {
-			log.Error("shutdown server: %w", err)
+			log.Errorf("shutdown server: %s", err)
 		}
 		cancelTimeout()
 		close(closed)

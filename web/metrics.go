@@ -97,7 +97,7 @@ func (m *Metrics) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"visits":    m.visitCount,
 			"startTime": m.startTime,
 			"failure": map[string]int{
-				"total":            m.failureTooLargeCount + m.failureWrongFileCount + m.failureParseFormCount + m.failureFormatCount + m.failureOtherCount,
+				"total":            m.failureTooLargeCount + m.failureWrongFileCount + m.failureParseFormCount + m.failureFormatCount + m.failureRateLimitCount + m.failureNoFilesCount + m.failureOtherCount,
 				"filesTooLarge":    m.failureTooLargeCount,
 				"wrongFileFormat":  m.failureWrongFileCount,
 				"parseFormError":   m.failureParseFormCount,
