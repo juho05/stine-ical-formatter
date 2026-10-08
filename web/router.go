@@ -2,7 +2,9 @@ package web
 
 import (
 	"context"
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 
@@ -50,6 +52,23 @@ func (s *Server) registerRoutes(r chi.Router) {
 	r.Post("/export", s.handlePostExport)
 	r.Get("/metrics", s.metrics.ServeHTTP)
 	r.Get("/static/css/tailwind.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("ETag", `"`+cssVersion+`"`)
+		if r.URL.Query().Get("v") == cssVersion {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			w.Header().Set("Cache-Control", "no-cache")
+		}
 		http.ServeFileFS(w, r, staticFS, "static/css/tailwind.css")
 	})
+}
+
+var cssVersion = mustHashStaticFile("static/css/tailwind.css")
+
+func mustHashStaticFile(name string) string {
+	data, err := staticFS.ReadFile(name)
+	if err != nil {
+		panic(fmt.Errorf("read %s: %w", name, err))
+	}
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:8])
 }
