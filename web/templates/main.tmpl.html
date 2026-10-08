@@ -21,7 +21,7 @@
     >License</a
   >
   <div
-    class="sm:card sm:bg-base-200 sm:h-auto sm:max-h-full sm:w-[680px] sm:min-w-[512px] h-screen"
+    class="sm:card sm:transition-none sm:bg-base-200 sm:h-auto sm:max-h-full sm:w-[680px] sm:min-w-[512px] h-screen"
   >
     <div class="sm:card-body p-4 sm:p-8 sm:pt-6 pt-16 h-full overflow-auto">
       <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
@@ -42,7 +42,7 @@
         />
         {{end}}
         <div class="flex justify-center gap-3 mt-6 mb-10 sm:mb-0">
-          <a href="/" class="btn">{{call .Translate "back"}}</a>
+          <a href="/" class="btn btn-flat">{{call .Translate "back"}}</a>
           <button class="btn btn-primary">{{call .Translate "export"}}</button>
         </div>
       </form>

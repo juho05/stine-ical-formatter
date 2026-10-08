@@ -5,3 +5,29 @@
 @theme {
   --breakpoint-xs: 30rem;
 }
+
+.btn-flat {
+  --btn-color: color-mix(in oklab, var(--color-base-content) 8%, var(--color-base-100));
+  --depth: 0;
+}
+
+:is(.input, .file-input):is(:focus, :focus-within) {
+  --input-color: var(--color-primary);
+  /* outline directly on the 1px border makes it 2px without shifting the content */
+  outline: 1px solid var(--color-primary);
+  outline-offset: 0;
+}
+
+/* daisyUI 5 dark theme has a much brighter base-content, compensate to keep the old border brightness */
+@media (prefers-color-scheme: dark) {
+  :is(.input, .file-input):not(:focus, :focus-within) {
+    --input-color: color-mix(in oklab, var(--color-base-content) 13%, #0000);
+  }
+}
+
+/* without height interpolation the delayed overflow clip lets closed content spill out */
+@supports not (interpolate-size: allow-keywords) {
+  .collapse:is(details)::details-content {
+    transition: none;
+  }
+}
