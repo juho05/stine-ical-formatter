@@ -13,7 +13,7 @@
     >Report Bug</a
   >
   <p class="absolute left-2 bottom-2 text-sm">
-    &copy; 2024-2025 Julian Hofmann
+    &copy; 2024-2026 Julian Hofmann
   </p>
   <a
     href="https://github.com/juho05/stine-ical-formatter/blob/main/LICENSE"
@@ -21,10 +21,32 @@
     >License</a
   >
   <div
-    class="sm:card sm:bg-base-200 sm:h-auto sm:w-[680px] sm:min-w-[512px] h-screen"
+    class="sm:card sm:bg-base-200 sm:h-auto sm:max-h-full sm:w-[680px] sm:min-w-[512px] h-screen"
   >
     <div class="sm:card-body p-4 sm:pt-6 pt-16 h-full overflow-auto">
       <h1 class="text-center font-bold text-2xl mb-6">STiNE iCal Formatter</h1>
+      {{if .Names}}
+      <form action="/export" method="post" class="flex flex-col gap-3 grow">
+        <input type="hidden" name="calendar" value="{{.Calendar}}" />
+        <p class="font-medium">{{call .Translate "rename-events"}}</p>
+        <p class="text-sm">{{call .Translate "rename-events.hint"}}</p>
+        {{range .Names}}
+        <input
+          type="text"
+          name="name"
+          value="{{.}}"
+          placeholder="{{.}}"
+          aria-label="{{.}}"
+          maxlength="200"
+          class="input input-bordered w-full"
+        />
+        {{end}}
+        <div class="flex justify-center gap-3 mt-6 mb-10 sm:mb-0">
+          <a href="/" class="btn">{{call .Translate "back"}}</a>
+          <button class="btn btn-primary">{{call .Translate "export"}}</button>
+        </div>
+      </form>
+      {{else}}
       <details
         tabindex="0"
         class="collapse collapse-arrow bg-base-100 border border-secondary mb-2"
@@ -43,6 +65,7 @@
             <li>{{call .Translate "how-to.7"}}</li>
             <li>{{call .Translate "how-to.8"}}</li>
             <li>{{call .Translate "how-to.9"}}</li>
+            <li>{{call .Translate "how-to.10"}}</li>
           </ol>
           <p class="mt-2">
             <b>{{call .Translate "how-to.warning"}}</b>
@@ -104,6 +127,7 @@
           </button>
         </div>
       </form>
+      {{end}}
     </div>
   </div>
 </div>

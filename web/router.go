@@ -47,6 +47,7 @@ func registerMiddlewares(r chi.Router) {
 func (s *Server) registerRoutes(r chi.Router) {
 	r.Get("/", s.handleGetMainPage)
 	r.Post("/", s.handlePostMainPage)
+	r.Post("/export", s.handlePostExport)
 	r.Get("/metrics", s.metrics.ServeHTTP)
 	r.Get("/static/css/tailwind.css", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(w, r, staticFS, "static/css/tailwind.css")

@@ -20,6 +20,7 @@ type Metrics struct {
 	failureWrongFileCount int
 	failureParseFormCount int
 	failureFormatCount    int
+	failureExportCount    int
 	failureRateLimitCount int
 	failureNoFilesCount   int
 	failureOtherCount     int
@@ -67,6 +68,12 @@ func (m *Metrics) FailureFormat() {
 	m.failureFormatCount++
 }
 
+func (m *Metrics) FailureExport() {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.failureExportCount++
+}
+
 func (m *Metrics) FailureRateLimit() {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -97,11 +104,12 @@ func (m *Metrics) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"visits":    m.visitCount,
 			"startTime": m.startTime,
 			"failure": map[string]int{
-				"total":            m.failureTooLargeCount + m.failureWrongFileCount + m.failureParseFormCount + m.failureFormatCount + m.failureRateLimitCount + m.failureNoFilesCount + m.failureOtherCount,
+				"total":            m.failureTooLargeCount + m.failureWrongFileCount + m.failureParseFormCount + m.failureFormatCount + m.failureExportCount + m.failureRateLimitCount + m.failureNoFilesCount + m.failureOtherCount,
 				"filesTooLarge":    m.failureTooLargeCount,
 				"wrongFileFormat":  m.failureWrongFileCount,
 				"parseFormError":   m.failureParseFormCount,
 				"formattingFailed": m.failureFormatCount,
+				"exportFailed":     m.failureExportCount,
 				"rateLimitReached": m.failureRateLimitCount,
 				"noFilesUploaded":  m.failureNoFilesCount,
 				"other":            m.failureOtherCount,

@@ -19,6 +19,8 @@ type renderer struct {
 
 type templateData struct {
 	ErrorMessageKey string
+	Calendar        string
+	Names           []string
 }
 
 //go:embed templates/*.tmpl.html
